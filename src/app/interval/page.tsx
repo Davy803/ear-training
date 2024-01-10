@@ -1,9 +1,9 @@
-import {IntervalTest} from "@/components/component/interval-test";
+import { IntervalTest } from "@/components/component/interval-test";
 
 export default function Notes() {
-    return (
-        <main>
-            <IntervalTest/>
-        </main>
-    )
+  return (
+    <main>
+      <IntervalTest />
+    </main>
+  );
 }

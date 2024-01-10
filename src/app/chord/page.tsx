@@ -1,9 +1,9 @@
-import {ChordTest} from "@/components/component/chord-test";
+import { ChordTest } from "@/components/component/chord-test";
 
 export default function Notes() {
-    return (
-        <main>
-            <ChordTest/>
-        </main>
-    )
+  return (
+    <main>
+      <ChordTest />
+    </main>
+  );
 }
