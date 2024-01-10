@@ -56,32 +56,37 @@ export function Dashboard() {
           </Card>
         </div>
       </div>
-      {/*<div className="grid gap-4">*/}
-      {/*    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Progress</h2>*/}
-      {/*    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">*/}
-      {/*        <Card className="bg-white dark:bg-gray-900 shadow-md">*/}
-      {/*            <CardContent className="p-4">*/}
-      {/*                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Notes*/}
-      {/*                    Progress</h3>*/}
-      {/*                <CurvedlineChart className="w-full aspect-[4/3]"/>*/}
-      {/*            </CardContent>*/}
-      {/*        </Card>*/}
-      {/*        <Card className="bg-white dark:bg-gray-900 shadow-md">*/}
-      {/*            <CardContent className="p-4">*/}
-      {/*                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Intervals*/}
-      {/*                    Progress</h3>*/}
-      {/*                <CurvedlineChart className="w-full aspect-[4/3]"/>*/}
-      {/*            </CardContent>*/}
-      {/*        </Card>*/}
-      {/*        <Card className="bg-white dark:bg-gray-900 shadow-md">*/}
-      {/*            <CardContent className="p-4">*/}
-      {/*                <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">Chords*/}
-      {/*                    Progress</h3>*/}
-      {/*                <CurvedlineChart className="w-full aspect-[4/3]"/>*/}
-      {/*            </CardContent>*/}
-      {/*        </Card>*/}
-      {/*    </div>*/}
-      {/*</div>*/}
+      <div className="grid gap-4">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
+          Progress (Not working yet)
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <Card className="bg-white dark:bg-gray-900 shadow-md">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                Notes Progress
+              </h3>
+              <CurvedlineChart className="w-full aspect-[4/3]" />
+            </CardContent>
+          </Card>
+          <Card className="bg-white dark:bg-gray-900 shadow-md">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                Intervals Progress
+              </h3>
+              <CurvedlineChart className="w-full aspect-[4/3]" />
+            </CardContent>
+          </Card>
+          <Card className="bg-white dark:bg-gray-900 shadow-md">
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                Chords Progress
+              </h3>
+              <CurvedlineChart className="w-full aspect-[4/3]" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </main>
   );
 }

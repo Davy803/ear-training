@@ -108,23 +108,26 @@ export function TestFramework({
         </div>
       )}
 
-      {/*<div className="w-full max-w-2xl mx-auto flex justify-between items-center px-4 py-2">*/}
-      {/*    <div className="text-sm text-gray-500 dark:text-gray-400">*/}
-      {/*        Score: <span className="font-bold text-red-500">10</span>*/}
-      {/*    </div>*/}
-      {/*    <div className="text-sm text-gray-500 dark:text-gray-400">*/}
-      {/*        Streak: <span className="font-bold text-green-500">3</span>*/}
-      {/*    </div>*/}
-      {/*    <div className="text-sm text-gray-500 dark:text-gray-400">*/}
-      {/*        Total: <span className="font-bold text-blue-500">20</span>*/}
-      {/*    </div>*/}
-      {/*    <div className="text-sm text-gray-500 dark:text-gray-400">*/}
-      {/*        Correct: <span className="font-bold text-green-500">15</span>*/}
-      {/*    </div>*/}
-      {/*    <Button className="ml-4" variant="outline">*/}
-      {/*        End Session*/}
-      {/*    </Button>*/}
-      {/*</div>*/}
+      <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        Below Not working yet
+      </h3>
+      <div className="w-full max-w-2xl mx-auto flex justify-between items-center px-4 py-2">
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          Score: <span className="font-bold text-red-500">10</span>
+        </div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          Streak: <span className="font-bold text-green-500">3</span>
+        </div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          Total: <span className="font-bold text-blue-500">20</span>
+        </div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">
+          Correct: <span className="font-bold text-green-500">15</span>
+        </div>
+        <Button className="ml-4" variant="outline">
+          End Session
+        </Button>
+      </div>
     </main>
   );
 }
