@@ -3,23 +3,42 @@
  * @see https://v0.dev/t/ejwRzEw5Z0k
  */
 import { Button } from "@/components/ui/button";
-import { useScoreStore } from "../util/score-context";
+import { useScoreStore } from "../../lib/state/score-context";
 import { useShallow } from "zustand/react/shallow";
+import { getQuestionWeights, getQuizMasteryScore } from "@/lib/random";
+import { Note } from "tone/Tone/core/type/Units";
 
-export function Scoring() {
-  const { getNumberCorrect, getNumberAnswered, currentStreak, totalQuestions } =
-    useScoreStore(
-      useShallow((state) => ({
-        getNumberCorrect: state.getNumberCorrect,
-        getNumberAnswered: state.getNumberAnswered,
-        currentStreak: state.currentStreak,
-        totalQuestions: state.totalQuestions,
-      }))
-    );
+export interface ScoringProps {
+  noteMapping: Record<string, Note[]>;
+}
+
+export function Scoring({ noteMapping }: ScoringProps) {
+  const {
+    answeredQuestions,
+    getNumberCorrect,
+    getNumberAnswered,
+    currentStreak,
+    totalQuestions,
+  } = useScoreStore(
+    useShallow((state) => ({
+      answeredQuestions: state.answeredQuestions,
+      getNumberCorrect: state.getNumberCorrect,
+
+      getNumberAnswered: state.getNumberAnswered,
+      currentStreak: state.currentStreak,
+      totalQuestions: state.totalQuestions,
+    }))
+  );
   const numberCorrect = getNumberCorrect();
   const numberAnswered = getNumberAnswered();
+
+  const masteryScore = getQuizMasteryScore(noteMapping, answeredQuestions);
   return (
     <div className="w-full max-w-2xl mx-auto flex justify-between items-center px-4 py-2">
+      <div className="text-sm text-gray-500 dark:text-gray-400">
+        Mastery Score (lower is better, mastered at 0):{" "}
+        <span className="font-bold text-correct">{masteryScore}</span>
+      </div>
       <div className="text-sm text-gray-500 dark:text-gray-400">
         Correct:{" "}
         <span className="font-bold text-correct">

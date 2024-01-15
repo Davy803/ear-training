@@ -4,7 +4,7 @@
  */
 import { Button } from "@/components/ui/button";
 import { ResponsiveBar } from "@nivo/bar";
-import { useScoreStore } from "../util/score-context";
+import { useScoreStore } from "../../lib/state/score-context";
 import { useShallow } from "zustand/react/shallow";
 import { groupBy } from "lodash";
 
@@ -72,17 +72,16 @@ function BarChart(props: { className: string }) {
     }))
   );
 
-  const grouping = groupBy(answeredQuestions, (x) => x.correctAnswer.text);
+  const grouping = groupBy(answeredQuestions, (x) => x.correctOption.text);
   const data = Object.keys(grouping).map((key) => {
     const answers = grouping[key];
     const correctAnswers = answers.filter(
-      (x) => x.correctAnswer.text === x.selectedAnswer.text
+      (x) => x.correctOption.key === x.selectedOption.key
     );
     return {
       name: key,
       correct: correctAnswers.length,
       incorrect: answers.length - correctAnswers.length,
-      // data: correctAnswers.length / answers.length,
     };
   });
   const format: (label: string | number) => string | number = (v) =>

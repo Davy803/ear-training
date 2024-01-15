@@ -1,7 +1,7 @@
 "use client";
 
 import { ChordTest } from "@/components/component/chord-test";
-import { useScoreStore } from "@/components/util/score-context";
+import { useScoreStore } from "@/lib/state/score-context";
 
 export default function Notes() {
   const resetAll = useScoreStore((store) => store.resetAll);

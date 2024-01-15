@@ -4,32 +4,31 @@
  */
 import { Button } from "@/components/ui/button";
 import { PlayNote } from "@/components/tone/play-note";
-import { sample } from "lodash";
+
 import { useEffect, useState } from "react";
 import { Correct } from "@/components/component/correct";
 import { Incorrect } from "@/components/component/incorrect";
 import { playNotes } from "@/lib/tone/piano";
 
 import { Scoring } from "./scoring";
-import { useScoreStore } from "../util/score-context";
+import { useScoreStore } from "../../lib/state/score-context";
 import { useShallow } from "zustand/react/shallow";
 import { QuizOption } from "@/lib/quiz/quiz-option";
 import { ScoreScreen } from "./score-screen";
+import { QuizQuestion } from "@/lib/quiz/question";
+import { getQuizQuestion } from "@/lib/random";
+import { Note } from "tone/Tone/core/type/Units";
 
 interface TestOptionsProps {
   nextQuestion: () => void;
-  options: QuizOption[];
-  correctOption: QuizOption | undefined;
+  question: QuizQuestion;
 }
 
-function TestOptions({
-  options,
-  correctOption,
-  nextQuestion,
-}: TestOptionsProps) {
+function TestOptions({ question, nextQuestion }: TestOptionsProps) {
   const [selected, setSelected] = useState<QuizOption>();
   const [isCorrect, setIsCorrect] = useState<boolean | undefined>();
 
+  const { correctOption: correctOption, options } = question;
   const scoring = useScoreStore(
     useShallow((state) => ({
       addAnsweredQuestions: state.addAnsweredQuestions,
@@ -56,7 +55,7 @@ function TestOptions({
           }
           return (
             <Button
-              key={opt.text}
+              key={opt.key}
               className="h-16"
               variant={variant}
               onClick={async () => {
@@ -65,8 +64,8 @@ function TestOptions({
                 // Only do scoring if no answer currently selected
                 if (selected === undefined) {
                   scoring.addAnsweredQuestions({
-                    selectedAnswer: opt,
-                    correctAnswer: correctOption,
+                    selectedOption: opt,
+                    correctOption: correctOption,
                   });
                   if (currentIsCorrect) {
                     scoring.incrementStreak();
@@ -124,22 +123,35 @@ function TestOptions({
 
 export interface TestFrameworkProps {
   headline: string;
-  getOptions: () => QuizOption[];
+  noteMapping: Record<string, Note[]>;
+  asChord?: boolean;
 }
 
-export function TestFramework({ headline, getOptions }: TestFrameworkProps) {
-  const [options, setOptions] = useState<QuizOption[]>([]);
-  const [correctOption, setCorrectOption] = useState<QuizOption | undefined>();
-
+export function TestFramework({
+  headline,
+  noteMapping,
+  asChord,
+}: TestFrameworkProps) {
+  const [question, setQuestion] = useState<QuizQuestion | undefined>();
   const [showScore, setShowScore] = useState<boolean>(false);
+  const answeredQuestions = useScoreStore((state) => state.answeredQuestions);
+
+  const nextQuestion = () => {
+    const newQuestion = getQuizQuestion(
+      noteMapping,
+      answeredQuestions,
+      asChord
+    );
+    setQuestion(newQuestion);
+  };
+
   // Because options are random, set them in useEffect so we don't have hydration error
   useEffect(() => {
-    const options = getOptions();
-    setOptions(options);
-    setCorrectOption(sample(options));
-  }, [getOptions]);
+    nextQuestion();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [asChord, noteMapping]);
 
-  const correctNotes = correctOption?.notes;
+  const correctNotes = question?.correctOption?.notes;
   // If we haven't populated options yet, don't render anything.
   if (!correctNotes) {
     return <></>;
@@ -154,19 +166,10 @@ export function TestFramework({ headline, getOptions }: TestFrameworkProps) {
             <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               {headline}
             </h2>
-            <PlayNote quizOption={correctOption} />
+            <PlayNote quizOption={question.correctOption} />
           </div>
-          <TestOptions
-            options={options}
-            correctOption={correctOption}
-            nextQuestion={() => {
-              const newOptions = getOptions();
-
-              setOptions(newOptions);
-              setCorrectOption(sample(newOptions) as QuizOption);
-            }}
-          />
-          <Scoring />
+          <TestOptions question={question} nextQuestion={nextQuestion} />
+          <Scoring noteMapping={noteMapping} />
 
           <Button
             className="ml-4"

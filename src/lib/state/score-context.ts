@@ -1,23 +1,21 @@
-import { QuizOption } from "@/lib/quiz/quiz-option";
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import { AnsweredQuestion } from "../quiz/question";
+import { getQuestionWeights } from "../random";
 
-export type Question = {
-  selectedAnswer: QuizOption;
-  correctAnswer: QuizOption;
-};
+const currentSchemaVersion = 1;
 
 export type ScoreState = {
+  schemaVersion: number;
   totalQuestions: number;
-  answeredQuestions: Question[];
+  answeredQuestions: AnsweredQuestion[];
   currentStreak: number;
 
   getNumberAnswered: () => number;
   getNumberCorrect: () => number;
+
   setTotalQuestions: (total: number) => void;
-  addAnsweredQuestions: (question: Question) => void;
-  //   incrementCorrect: () => void;
-  //   incrementNumberAnswered: () => void;
+  addAnsweredQuestions: (question: AnsweredQuestion) => void;
   incrementStreak: () => void;
   resetStreak: () => void;
   resetAll: () => void;
@@ -27,26 +25,21 @@ export const useScoreStore = create<ScoreState>()(
   devtools(
     persist(
       (set, get) => ({
+        schemaVersion: currentSchemaVersion,
         totalQuestions: 20,
-        // numberCorrect: 0,
-        // numberAnswered: 0,
         answeredQuestions: [],
         currentStreak: 0,
         getNumberAnswered: () => get().answeredQuestions.length,
         getNumberCorrect: () =>
           get().answeredQuestions.filter(
-            (x) => x.correctAnswer.text === x.selectedAnswer.text
+            (x) => x.correctOption.key === x.selectedOption.key
           ).length,
-        addAnsweredQuestions: (question: Question) =>
+        addAnsweredQuestions: (question: AnsweredQuestion) =>
           set((state) => ({
             answeredQuestions: [...state.answeredQuestions, question],
           })),
         setTotalQuestions: (total) =>
           set((_state) => ({ totalQuestions: total })),
-        // incrementCorrect: () =>
-        //   set((state) => ({ numberCorrect: state.numberCorrect + 1 })),
-        // incrementNumberAnswered: () =>
-        //   set((state) => ({ numberAnswered: state.numberAnswered + 1 })),
         incrementStreak: () =>
           set((state) => ({ currentStreak: state.currentStreak + 1 })),
         resetStreak: () => set((_state) => ({ currentStreak: 0 })),
@@ -59,6 +52,24 @@ export const useScoreStore = create<ScoreState>()(
       }),
       {
         name: "score-storage",
+        version: 1,
+        migrate: (persistedState: any, version) => {
+          if (version === 0) {
+            if (persistedState.answeredQuestions?.length) {
+              persistedState.answeredQuestions.forEach((x: any) => {
+                x.selectedOption = x.selectedAnswer;
+                x.selectedOption.key = x.selectedOption.text;
+                delete x.selectedAnswer;
+
+                x.correctOption = x.correctAnswer;
+                x.correctOption.key = x.correctOption.text;
+                delete x.correctAnswer;
+              });
+            }
+          }
+
+          return persistedState;
+        },
       }
     )
   )
