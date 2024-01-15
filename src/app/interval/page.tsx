@@ -1,6 +1,6 @@
 "use client";
 
-import { IntervalTest } from "@/components/component/interval-test";
+import { IntervalQuiz } from "@/components/quizes/interval-quiz";
 import { useScoreStore } from "@/lib/state/score-context";
 
 export default function Interval() {
@@ -8,5 +8,5 @@ export default function Interval() {
   
   resetAll();
   
-  return <IntervalTest />;
+  return <IntervalQuiz />;
 }

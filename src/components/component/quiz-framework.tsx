@@ -19,12 +19,12 @@ import { QuizQuestion } from "@/lib/quiz/question";
 import { getQuizQuestion } from "@/lib/random";
 import { Note } from "tone/Tone/core/type/Units";
 
-interface TestOptionsProps {
+interface QuizOptionsProps {
   nextQuestion: () => void;
   question: QuizQuestion;
 }
 
-function TestOptions({ question, nextQuestion }: TestOptionsProps) {
+function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
   const [selected, setSelected] = useState<QuizOption>();
   const [isCorrect, setIsCorrect] = useState<boolean | undefined>();
 
@@ -121,17 +121,17 @@ function TestOptions({ question, nextQuestion }: TestOptionsProps) {
   );
 }
 
-export interface TestFrameworkProps {
+export interface QuizFrameworkProps {
   headline: string;
   noteMapping: Record<string, Note[]>;
   asChord?: boolean;
 }
 
-export function TestFramework({
+export function QuizFramework({
   headline,
   noteMapping,
   asChord,
-}: TestFrameworkProps) {
+}: QuizFrameworkProps) {
   const [question, setQuestion] = useState<QuizQuestion | undefined>();
   const [showScore, setShowScore] = useState<boolean>(false);
   const answeredQuestions = useScoreStore((state) => state.answeredQuestions);
@@ -168,7 +168,7 @@ export function TestFramework({
             </h2>
             <PlayNote quizOption={question.correctOption} />
           </div>
-          <TestOptions question={question} nextQuestion={nextQuestion} />
+          <QuizOptions question={question} nextQuestion={nextQuestion} />
           <Scoring noteMapping={noteMapping} />
 
           <Button

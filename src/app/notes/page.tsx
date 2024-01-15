@@ -1,11 +1,11 @@
 "use client";
 
-import { NoteTest } from "@/components/component/note-test";
+import { NoteQuiz } from "@/components/quizes/note-quiz";
 import { useScoreStore } from "@/lib/state/score-context";
 
 export default function Notes() {
   const resetAll = useScoreStore((store) => store.resetAll);
   resetAll();
 
-  return <NoteTest />;
+  return <NoteQuiz />;
 }
