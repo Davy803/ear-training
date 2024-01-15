@@ -5,46 +5,44 @@
 import { Button } from "@/components/ui/button";
 import { PlayNote } from "@/components/tone/play-note";
 import { sample } from "lodash";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Correct } from "@/components/component/correct";
 import { Incorrect } from "@/components/component/incorrect";
 import { playNotes } from "@/lib/tone/piano";
-import { Note } from "tone/Tone/core/type/Units";
 
-export interface TestOption {
-  notes: Note[];
-  text: string;
+import { Scoring } from "./scoring";
+import { useScoreStore } from "../util/score-context";
+import { useShallow } from "zustand/react/shallow";
+import { QuizOption } from "@/lib/quiz/quiz-option";
+import { ScoreScreen } from "./score-screen";
+
+interface TestOptionsProps {
+  nextQuestion: () => void;
+  options: QuizOption[];
+  correctOption: QuizOption | undefined;
 }
 
-export interface TestFrameworkProps {
-  headline: string;
-  getOptions: () => TestOption[];
-  asChord?: boolean;
-}
-
-export function TestFramework({
-  headline,
-  getOptions,
-  asChord,
-}: TestFrameworkProps) {
-  const [selected, setSelected] = useState<TestOption>();
+function TestOptions({
+  options,
+  correctOption,
+  nextQuestion,
+}: TestOptionsProps) {
+  const [selected, setSelected] = useState<QuizOption>();
   const [isCorrect, setIsCorrect] = useState<boolean | undefined>();
-  const [options, setOptions] = useState(getOptions());
 
-  const [correctOption, setCorrectOption] = useState<TestOption>(
-    sample(options) as TestOption
+  const scoring = useScoreStore(
+    useShallow((state) => ({
+      addAnsweredQuestions: state.addAnsweredQuestions,
+      incrementStreak: state.incrementStreak,
+      resetStreak: state.resetStreak,
+    }))
   );
+  if (!correctOption) {
+    return <></>;
+  }
 
-  const correctNotes = correctOption.notes;
   return (
-    <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 py-8 px-4">
-      <div className="w-full flex flex-col items-center gap-4">
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-          {headline}
-        </h2>
-        {/*<PlayNote notes={["A3", "C4", "E4"]}/>*/}
-        <PlayNote notes={correctNotes} asChord={asChord} />
-      </div>
+    <div>
       <div className="w-full grid grid-cols-2 gap-4">
         {options.map((opt) => {
           let variant = "outline" as "outline" | "correct" | "incorrect";
@@ -62,15 +60,31 @@ export function TestFramework({
               className="h-16"
               variant={variant}
               onClick={async () => {
-                const isCorrect = opt === correctOption;
-                setIsCorrect(isCorrect);
+                const currentIsCorrect = opt === correctOption;
+
+                // Only do scoring if no answer currently selected
+                if (selected === undefined) {
+                  scoring.addAnsweredQuestions({
+                    selectedAnswer: opt,
+                    correctAnswer: correctOption,
+                  });
+                  if (currentIsCorrect) {
+                    scoring.incrementStreak();
+                  } else {
+                    scoring.resetStreak();
+                  }
+                }
+
+                setIsCorrect(currentIsCorrect);
                 setSelected(opt);
-                await playNotes({ notes: opt.notes, asChord });
-                if (!isCorrect) {
+
+                await playNotes({ quizOption: opt });
+                if (!currentIsCorrect) {
                   await playNotes({
-                    notes: correctOption.notes,
-                    asChord,
-                    time: asChord ? 1.5 : 1 + opt.notes.length / 2,
+                    quizOption: correctOption,
+                    time: correctOption.asChord
+                      ? 1.5
+                      : 1 + opt.notes.length / 2,
                   });
                 }
               }}
@@ -97,37 +111,74 @@ export function TestFramework({
               setIsCorrect(undefined);
               setSelected(undefined);
 
-              const newOptions = getOptions();
-
-              setOptions(newOptions);
-              setCorrectOption(sample(newOptions) as TestOption);
+              nextQuestion();
             }}
           >
             Next Question
           </Button>
         </div>
       )}
+    </div>
+  );
+}
 
-      <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-        Below Not working yet
-      </h3>
-      <div className="w-full max-w-2xl mx-auto flex justify-between items-center px-4 py-2">
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Score: <span className="font-bold text-red-500">10</span>
-        </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Streak: <span className="font-bold text-green-500">3</span>
-        </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Total: <span className="font-bold text-blue-500">20</span>
-        </div>
-        <div className="text-sm text-gray-500 dark:text-gray-400">
-          Correct: <span className="font-bold text-green-500">15</span>
-        </div>
-        <Button className="ml-4" variant="outline">
-          End Session
-        </Button>
-      </div>
+export interface TestFrameworkProps {
+  headline: string;
+  getOptions: () => QuizOption[];
+}
+
+export function TestFramework({ headline, getOptions }: TestFrameworkProps) {
+  const [options, setOptions] = useState<QuizOption[]>([]);
+  const [correctOption, setCorrectOption] = useState<QuizOption | undefined>();
+
+  const [showScore, setShowScore] = useState<boolean>(false);
+  // Because options are random, set them in useEffect so we don't have hydration error
+  useEffect(() => {
+    const options = getOptions();
+    setOptions(options);
+    setCorrectOption(sample(options));
+  }, [getOptions]);
+
+  const correctNotes = correctOption?.notes;
+  // If we haven't populated options yet, don't render anything.
+  if (!correctNotes) {
+    return <></>;
+  }
+  return (
+    <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 py-8 px-4">
+      {showScore ? (
+        <ScoreScreen />
+      ) : (
+        <>
+          <div className="w-full flex flex-col items-center gap-4">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              {headline}
+            </h2>
+            <PlayNote quizOption={correctOption} />
+          </div>
+          <TestOptions
+            options={options}
+            correctOption={correctOption}
+            nextQuestion={() => {
+              const newOptions = getOptions();
+
+              setOptions(newOptions);
+              setCorrectOption(sample(newOptions) as QuizOption);
+            }}
+          />
+          <Scoring />
+
+          <Button
+            className="ml-4"
+            variant="outline"
+            onClick={() => {
+              setShowScore(true);
+            }}
+          >
+            End Session
+          </Button>
+        </>
+      )}
     </main>
   );
 }

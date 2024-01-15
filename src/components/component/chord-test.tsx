@@ -19,9 +19,12 @@ export function ChordTest() {
   return (
     <TestFramework
       headline={"Identify the chord"}
-      asChord
       getOptions={() =>
-        sampleSize(notes, 4).map((x) => ({ text: x, notes: ChordMap[x] }))
+        sampleSize(notes, 4).map((x) => ({
+          text: x,
+          notes: ChordMap[x],
+          asChord: true,
+        }))
       }
     />
   );

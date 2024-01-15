@@ -2,16 +2,17 @@
 
 import * as Tone from "tone";
 import { Note } from "tone/Tone/core/type/Units";
+import { QuizOption } from "../quiz/quiz-option";
 
 export interface PlayNoteProps {
-  notes: Note[];
-  asChord?: boolean;
+  quizOption: QuizOption;
   time?: number;
 }
 
 let piano: Tone.Sampler;
 
-export async function playNotes({ notes, asChord, time }: PlayNoteProps) {
+export async function playNotes({ quizOption, time }: PlayNoteProps) {
+  const { asChord, notes } = quizOption;
   if (!piano) {
     piano = new Tone.Sampler({
       urls: {
