@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="w-full h-screen bg-gray-100 dark:bg-gray-800">
+        <div className="w-full min-h-screen bg-gray-100 dark:bg-gray-800">
           <header className="flex items-center justify-between px-6 py-4 bg-white dark:bg-gray-900 shadow-md">
             <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
               <Link href={"/"}> Ear Training App</Link>
@@ -39,7 +39,7 @@ export default function RootLayout({
               </Link>
             </div>
           </header>
-          <div className="flex min-h-screen flex-col items-center justify-between p-24">
+          <div className="flex min-min-h-screen flex-col items-center justify-between p-24">
             {children}
           </div>
         </div>

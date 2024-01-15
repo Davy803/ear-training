@@ -31,6 +31,10 @@ export function getQuizQuestion(
 
   const correctAnswerKey = weightedRandom(weights);
 
+  if (!correctAnswerKey) {
+    throw Error("No questions available");
+  }
+
   const allOptions = keys.map(
     (key): QuizOption => ({
       key,
@@ -54,12 +58,15 @@ export function getQuizQuestion(
   };
 }
 
-function weightedRandom(weights: Record<string, number>) {
+function weightedRandom(weights: Record<string, number>): string | undefined {
   const keys = Object.keys(weights);
   const newList = keys.reduce(
     (prev, key) => [...prev, ...Array(weights[key]).fill(key)],
     [] as string[]
   );
+  if (newList.length === 0) {
+    return undefined;
+  }
   const rand = baseRandom(0, newList.length - 1);
   const value = newList[rand];
   return value;
@@ -160,6 +167,11 @@ function getOptions(
   }
 
   const optionKey = weightedRandom(weights);
+
+  // If no more answers available, just return the ones we have
+  if (!optionKey) {
+    return shuffle(selectedOptions);
+  }
 
   const newOptions = [...selectedOptions, availableOptions[optionKey]];
 
