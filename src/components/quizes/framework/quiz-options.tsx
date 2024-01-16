@@ -50,7 +50,7 @@ export function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
     if (!currentIsCorrect && selected === undefined) {
       await playNotes({
         quizOption: correctOption,
-        time: correctOption.asChord ? 1.5 : 1 + opt.notes.length / 2,
+        time: correctOption.asChord ? 1.5 : 1 + (opt.notes?.length ?? 0) / 2,
       });
     }
   };

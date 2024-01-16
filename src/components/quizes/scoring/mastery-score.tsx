@@ -21,10 +21,6 @@ export function MasteryScore({
   quizId: string;
   quizOptions: QuizOption[];
 }) {
-  useEffect(() => {
-    return useScoreStore.subscribe(console.log);
-  }, []);
-
   const { getAnsweredQuestions } = useScoreDataFetcher();
 
   const answeredQuestions = getAnsweredQuestions(quizId);

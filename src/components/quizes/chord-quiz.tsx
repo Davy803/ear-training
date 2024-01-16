@@ -7,6 +7,7 @@
 import { QuizFramework } from "@/components/quizes/framework/quiz-framework";
 import { NoteList, StartingNote } from "@/lib/note-map";
 import { QuizOption } from "@/lib/quiz/quiz-option";
+import { sample } from "lodash";
 import { Note } from "tone/Tone/core/type/Units";
 
 export const ChordMap: Record<string, Note[]> = {
@@ -24,21 +25,23 @@ export type ChordTypes = keyof typeof ChordStepMap;
 
 export function getChordQuizOptions(
   startingNotes: StartingNote[],
-  chordType: ChordTypes,
+  chordTypes: ChordTypes[],
 ) {
-  const allOptions = startingNotes.map((startingNote): QuizOption => {
+  const allOptions = chordTypes.map((chordType): QuizOption => {
     const semitones = ChordStepMap[chordType];
 
-    const startingNoteIndex = NoteList.indexOf(startingNote);
-
-    const notes = semitones.map((x) => NoteList[startingNoteIndex + x]);
-
     return {
-      uniqueId: `chord-${chordType}-${startingNote}`,
-      key: `${startingNote} ${chordType}`,
-      text: `${startingNote} ${chordType}`,
-      hintText: `(${notes.join()}`,
-      notes: notes,
+      uniqueId: `chord-${chordType}`,
+      key: `${chordType}`,
+      text: `${chordType}`,
+      hintText: "",
+      populateNotes: () => {
+        const startingNote = sample(startingNotes) as StartingNote;
+        const startingNoteIndex = NoteList.indexOf(startingNote);
+
+        const notes = semitones.map((x) => NoteList[startingNoteIndex + x]);
+        return notes;
+      },
       asChord: true,
       instrument: "piano",
     };
@@ -48,16 +51,11 @@ export function getChordQuizOptions(
 }
 
 export function ChordQuiz() {
-  const majorOptions = getChordQuizOptions(
+  const quizOptions = getChordQuizOptions(
     ["C4", "D4", "E4", "F4", "G4"],
-    "Major",
-  );
-  const minorOptions = getChordQuizOptions(
-    ["C4", "D4", "E4", "F4", "G4"],
-    "Minor",
+    ["Major", "Minor"],
   );
 
-  const quizOptions = [...majorOptions, ...minorOptions];
   return (
     <QuizFramework
       quizId="chords"

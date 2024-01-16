@@ -13,7 +13,7 @@ export function getNoteQuizOptions() {
       key: note,
       text: note,
       hintText: "",
-      notes: [note],
+      populateNotes: () => [note],
       asChord: false,
       instrument: "piano",
     };
@@ -25,6 +25,11 @@ export function getNoteQuizOptions() {
 export function NoteQuiz() {
   const quizOptions = getNoteQuizOptions();
   return (
-    <QuizFramework quizId="notes" headline={"Identify the note"} quizOptions={quizOptions} />
+    <QuizFramework
+      quizId="notes"
+      headline={"Identify the note"}
+      quizOptions={quizOptions}
+      preventSameAnswer
+    />
   );
 }

@@ -12,14 +12,19 @@ export interface PlayNoteProps {
 let piano: Tone.Sampler;
 
 export async function playNotes({ quizOption, time }: PlayNoteProps) {
-  const { asChord, notes } = quizOption;
+  const asChord = quizOption.asChord;
+  const notes = quizOption.notes ?? [];
+
   if (!piano) {
+    // prettier-ignore
     piano = new Tone.Sampler({
       urls: {
-        C4: "C4.mp3",
-        "D#4": "Ds4.mp3",
+        "C4": "C4.mp3",
         "F#4": "Fs4.mp3",
-        A4: "A4.mp3",
+        "A4": "A4.mp3",
+        "C5": "C5.mp3",
+        "F#5": "Fs5.mp3",
+        "B5": "B5.mp3",
       },
       release: 1,
       baseUrl: "https://tonejs.github.io/audio/salamander/",

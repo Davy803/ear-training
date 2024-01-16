@@ -24,13 +24,26 @@ export function getQuizQuestion(
   quizId: string,
   allOptions: QuizOption[],
   answeredQuestions: AnsweredQuestion[],
+  preventSameAnswer: boolean,
 ): QuizQuestion {
-  const allOptionsMap = keyBy(allOptions, "key");
+  // Make a clone of the options with the notes populated, so the original will remain unpopulated
+  // and unmodified
+  const clonedOptions: QuizOption[] = allOptions.map((x) => ({
+    uniqueId: x.uniqueId,
+    key: x.key,
+    text: x.text,
+    hintText: x.hintText,
+    populateNotes: x.populateNotes,
+    notes: x.populateNotes(),
+    asChord: x.asChord,
+    instrument: x.instrument,
+  }));
+  const clonedOptionsMap = keyBy(clonedOptions, "key");
 
   const weights = getQuestionWeights(
     answeredQuestions,
-    Object.keys(allOptionsMap),
-    true,
+    Object.keys(clonedOptionsMap),
+    preventSameAnswer,
   );
 
   const correctAnswerKey = weightedRandom(weights);
@@ -41,13 +54,13 @@ export function getQuizQuestion(
 
   const options = getOptions(
     answeredQuestions,
-    allOptionsMap,
+    clonedOptionsMap,
     correctAnswerKey,
   );
 
   return {
     quizId,
-    correctOption: allOptionsMap[correctAnswerKey],
+    correctOption: clonedOptionsMap[correctAnswerKey],
     options,
   };
 }
@@ -82,6 +95,11 @@ export function getQuestionWeights(
   // Adjust weight based on historical accuracy
   for (let index = 0; index < answeredQuestions.length; index++) {
     const question = answeredQuestions[index];
+
+    // If we got an old answer that's no longre relevant, ignore it
+    if (weights[question.correctOption.key] === undefined) {
+      continue;
+    }
 
     // Incorrect answers weigh more heavily than correct
     if (question.correctOption.key !== question.selectedOption.key) {

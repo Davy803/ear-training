@@ -25,12 +25,14 @@ export interface QuizFrameworkProps {
   headline: string;
   quizOptions: QuizOption[];
   asChord?: boolean;
+  preventSameAnswer?: boolean;
 }
 
 export function QuizFramework({
   quizId,
   headline,
   quizOptions,
+  preventSameAnswer,
   asChord,
 }: QuizFrameworkProps) {
   const [question, setQuestion] = useState<QuizQuestion | undefined>();
@@ -42,7 +44,12 @@ export function QuizFramework({
   const resetAll = useScoreStore((store) => store.resetAll);
 
   const nextQuestion = () => {
-    const newQuestion = getQuizQuestion(quizId, quizOptions, answeredQuestions);
+    const newQuestion = getQuizQuestion(
+      quizId,
+      quizOptions,
+      answeredQuestions,
+      preventSameAnswer === true,
+    );
     setQuestion(newQuestion);
   };
 
@@ -52,11 +59,11 @@ export function QuizFramework({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [asChord, quizOptions]);
 
-  const correctNotes = question?.correctOption?.notes;
   // If we haven't populated options yet, don't render anything.
-  if (!correctNotes) {
+  if (!question) {
     return <></>;
   }
+
   return (
     <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 py-8 px-4">
       <div className="w-full flex flex-col items-center gap-4">

@@ -60,7 +60,7 @@ export function getIntervalQuizOptions(
       key,
       text: key,
       hintText: `${key} (${startingNote} ${NoteList[nextNoteIndex]})`,
-      notes: [startingNote, NoteList[nextNoteIndex]],
+      populateNotes: () => [startingNote, NoteList[nextNoteIndex]],
       asChord: false,
       instrument: "piano",
     };
@@ -76,6 +76,7 @@ export function IntervalQuiz() {
       quizId="interval"
       headline={"Identify the interval"}
       quizOptions={quizOptions}
+      preventSameAnswer
     />
   );
 }
