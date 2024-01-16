@@ -5,28 +5,77 @@
  * @see https://v0.dev/t/ejwRzEw5Z0k
  */
 import { QuizFramework } from "@/components/quizes/framework/quiz-framework";
+import { NoteList } from "@/lib/note-map";
+import { QuizOption } from "@/lib/quiz/quiz-option";
 import { Note } from "tone/Tone/core/type/Units";
 
-export const IntervalMap: Record<string, Note[]> = {
-  Unison: ["C4", "C4"],
-  "Minor 2nd": ["C4", "Db4"],
-  "Major 2nd": ["C4", "D4"],
-  "Minor 3rd": ["C4", "Eb4"],
-  "Major 3rd": ["C4", "E4"],
-  "Perfect 4th": ["C4", "F4"],
-  Tritone: ["C4", "F#4"],
-  "Perfect 5th": ["C4", "G4"],
-  "Minor 6th": ["C4", "Ab4"],
-  "Major 6th": ["C4", "A4"],
-  "Minor 7th": ["C4", "Bb4"],
-  "Major 7th": ["C4", "B4"],
+// export const IntervalMap: Record<string, Note[]> = {
+//   Unison: ["C4", "C4"],
+//   "Minor 2nd": ["C4", "Db4"],
+//   "Major 2nd": ["C4", "D4"],
+//   "Minor 3rd": ["C4", "Eb4"],
+//   "Major 3rd": ["C4", "E4"],
+//   "Perfect 4th": ["C4", "F4"],
+//   Tritone: ["C4", "F#4"],
+//   "Perfect 5th": ["C4", "G4"],
+//   "Minor 6th": ["C4", "Ab4"],
+//   "Major 6th": ["C4", "A4"],
+//   "Minor 7th": ["C4", "Bb4"],
+//   "Major 7th": ["C4", "B4"],
+// };
+
+// prettier-ignore
+export const IntervalStepMap: Record<string, number> = {
+  "Unison": 0,
+  "Minor 2nd": 1,
+  "Major 2nd": 2,
+  "Minor 3rd": 3,
+  "Major 3rd": 4,
+  "Perfect 4th": 5,
+  "Tritone": 6,
+  "Perfect 5th": 7,
+  "Minor 6th": 8,
+  "Major 6th": 9,
+  "Minor 7th": 10,
+  "Major 7th": 11,
+  "Octave": 12
 };
 
+export function getIntervalQuizOptions(
+  startingNote: Note,
+  direction: "asc" | "desc",
+) {
+  const keys = Object.keys(IntervalStepMap);
+
+  const allOptions = keys.map((key): QuizOption => {
+    const semitones = IntervalStepMap[key];
+    const startingNoteIndex = NoteList.indexOf(startingNote);
+    const nextNoteIndex =
+      direction === "asc"
+        ? startingNoteIndex + semitones
+        : startingNoteIndex - semitones;
+
+    return {
+      uniqueId: key,
+      key,
+      text: key,
+      hintText: `${key} (${startingNote} ${NoteList[nextNoteIndex]})`,
+      notes: [startingNote, NoteList[nextNoteIndex]],
+      asChord: false,
+      instrument: "piano",
+    };
+  });
+
+  return allOptions;
+}
+
 export function IntervalQuiz() {
+  const quizOptions = getIntervalQuizOptions("G4", "desc"); //getQuizOptions(IntervalMap);
   return (
     <QuizFramework
+      quizId="interval"
       headline={"Identify the interval"}
-      noteMapping={IntervalMap}
+      quizOptions={quizOptions}
     />
   );
 }

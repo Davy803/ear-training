@@ -4,10 +4,10 @@ import { QuizOption } from "./quiz/quiz-option";
 import { clamp, keyBy, shuffle } from "lodash";
 
 export function getQuizMasteryScore(
-  noteMapping: Record<string, Note[]>,
-  answeredQuestions: AnsweredQuestion[]
+  quizOptions: QuizOption[],
+  answeredQuestions: AnsweredQuestion[],
 ): number {
-  const keys = Object.keys(noteMapping);
+  const keys = quizOptions.map((x) => x.key);
 
   const weights = getQuestionWeights(answeredQuestions, keys, false);
 
@@ -21,13 +21,17 @@ export function getQuizMasteryScore(
 }
 
 export function getQuizQuestion(
-  noteMapping: Record<string, Note[]>,
+  quizId: string,
+  allOptions: QuizOption[],
   answeredQuestions: AnsweredQuestion[],
-  asChord = false
 ): QuizQuestion {
-  const keys = Object.keys(noteMapping);
+  const allOptionsMap = keyBy(allOptions, "key");
 
-  const weights = getQuestionWeights(answeredQuestions, keys, true);
+  const weights = getQuestionWeights(
+    answeredQuestions,
+    Object.keys(allOptionsMap),
+    true,
+  );
 
   const correctAnswerKey = weightedRandom(weights);
 
@@ -35,24 +39,14 @@ export function getQuizQuestion(
     throw Error("No questions available");
   }
 
-  const allOptions = keys.map(
-    (key): QuizOption => ({
-      key,
-      text: key,
-      notes: noteMapping[key],
-      asChord,
-    })
-  );
-
-  const allOptionsMap = keyBy(allOptions, "key");
-
   const options = getOptions(
     answeredQuestions,
     allOptionsMap,
-    correctAnswerKey
+    correctAnswerKey,
   );
 
   return {
+    quizId,
     correctOption: allOptionsMap[correctAnswerKey],
     options,
   };
@@ -62,7 +56,7 @@ function weightedRandom(weights: Record<string, number>): string | undefined {
   const keys = Object.keys(weights);
   const newList = keys.reduce(
     (prev, key) => [...prev, ...Array(weights[key]).fill(key)],
-    [] as string[]
+    [] as string[],
   );
   if (newList.length === 0) {
     return undefined;
@@ -75,7 +69,7 @@ function weightedRandom(weights: Record<string, number>): string | undefined {
 export function getQuestionWeights(
   answeredQuestions: AnsweredQuestion[],
   allOptionKeys: string[],
-  withCorrection: boolean
+  withCorrection: boolean,
 ) {
   const weights: Record<string, number> = {};
 
@@ -117,7 +111,7 @@ export function getQuestionWeights(
       answeredQuestions[answeredQuestions.length - 1]?.correctOption;
     if (penultimateCorrectOption) {
       weights[penultimateCorrectOption.key] = Math.round(
-        weights[penultimateCorrectOption.key] / 2
+        weights[penultimateCorrectOption.key] / 2,
       );
     }
   }
@@ -130,12 +124,12 @@ function getOptions(
   availableOptions: Record<string, QuizOption>,
   correctOptionKey: string,
   numberOfOptions = 4,
-  selectedOptions: QuizOption[] = [availableOptions[correctOptionKey]]
+  selectedOptions: QuizOption[] = [availableOptions[correctOptionKey]],
 ) {
   const weights: Record<string, number> = {};
 
   const relevantQuestions = answeredQuestions.filter(
-    (x) => x.correctOption.key === correctOptionKey
+    (x) => x.correctOption.key === correctOptionKey,
   );
   const selectedOptionsKeys = selectedOptions.map((x) => x.key);
 
@@ -157,12 +151,12 @@ function getOptions(
   // No more historically incorrect answers, pick at random
   if (Object.keys(weights).length === 0) {
     const validOptions = Object.values(availableOptions).filter((x) =>
-      isValidOption(x, correctOptionKey)
+      isValidOption(x, correctOptionKey),
     );
 
     for (let index = 0; index < validOptions.length; index++) {
       const opt = validOptions[index];
-      weights[opt.text] = 1;
+      weights[opt.key] = 1;
     }
   }
 
@@ -181,11 +175,11 @@ function getOptions(
       availableOptions,
       correctOptionKey,
       numberOfOptions,
-      newOptions
+      newOptions,
     );
   } else if (newOptions.length > numberOfOptions) {
     throw Error(
-      `Got more than 'numberOfOptions' options (${newOptions.length} > ${numberOfOptions})`
+      `Got more than 'numberOfOptions' options (${newOptions.length} > ${numberOfOptions})`,
     );
   } else {
     return shuffle(newOptions);

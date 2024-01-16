@@ -6,12 +6,12 @@ import { PlayNoteProps, playNotes } from "@/lib/tone/piano";
 export function PlayNote(props: PlayNoteProps) {
   return (
     <Button
-      className="w-40 h-40 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
+      className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
       onClick={() => {
         playNotes(props);
       }}
     >
-      <PlayIcon className="w-12 h-12 text-gray-900 dark:text-gray-100" />
+      <PlayIcon className="w-8 h-8 text-gray-900 dark:text-gray-100" />
     </Button>
   );
 }

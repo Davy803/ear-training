@@ -5,6 +5,8 @@
  * @see https://v0.dev/t/ejwRzEw5Z0k
  */
 import { QuizFramework } from "@/components/quizes/framework/quiz-framework";
+import { NoteList, StartingNote } from "@/lib/note-map";
+import { QuizOption } from "@/lib/quiz/quiz-option";
 import { Note } from "tone/Tone/core/type/Units";
 
 export const ChordMap: Record<string, Note[]> = {
@@ -12,11 +14,55 @@ export const ChordMap: Record<string, Note[]> = {
   "C Major": ["C4", "E4", "G4"],
 };
 
+// prettier-ignore
+export const ChordStepMap = {
+  "Minor": [0, 3, 7],
+  "Major": [0, 4, 7],
+};
+
+export type ChordTypes = keyof typeof ChordStepMap;
+
+export function getChordQuizOptions(
+  startingNotes: StartingNote[],
+  chordType: ChordTypes,
+) {
+  const allOptions = startingNotes.map((startingNote): QuizOption => {
+    const semitones = ChordStepMap[chordType];
+
+    const startingNoteIndex = NoteList.indexOf(startingNote);
+
+    const notes = semitones.map((x) => NoteList[startingNoteIndex + x]);
+
+    return {
+      uniqueId: `chord-${chordType}-${startingNote}`,
+      key: `${startingNote} ${chordType}`,
+      text: `${startingNote} ${chordType}`,
+      hintText: `(${notes.join()}`,
+      notes: notes,
+      asChord: true,
+      instrument: "piano",
+    };
+  });
+
+  return allOptions;
+}
+
 export function ChordQuiz() {
+  const majorOptions = getChordQuizOptions(
+    ["C4", "D4", "E4", "F4", "G4"],
+    "Major",
+  );
+  const minorOptions = getChordQuizOptions(
+    ["C4", "D4", "E4", "F4", "G4"],
+    "Minor",
+  );
+
+  const quizOptions = [...majorOptions, ...minorOptions];
   return (
     <QuizFramework
+      quizId="chords"
       headline={"Identify the chord"}
-      noteMapping={ChordMap}
+      quizOptions={quizOptions}
       asChord
     />
   );

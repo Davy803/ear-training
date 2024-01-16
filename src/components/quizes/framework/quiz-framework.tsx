@@ -7,37 +7,42 @@ import { PlayNote } from "@/components/tone/play-note";
 
 import { useEffect, useState } from "react";
 
-import { Scoring } from "./scoring";
-import { useScoreStore } from "../../../lib/state/score-context";
+import { Scoring } from "../scoring/scoring";
+import {
+  useScoreDataFetcher,
+  useScoreStore,
+} from "../../../lib/state/score-context";
 import { QuizQuestion } from "@/lib/quiz/question";
 import { getQuizQuestion } from "@/lib/random";
-import { Note } from "tone/Tone/core/type/Units";
 import { QuizOptions } from "./quiz-options";
-import { ScoreDetails } from "./score-details";
+import { ScoreDetails } from "../scoring/score-details";
 import Link from "next/link";
+import { QuizOption } from "@/lib/quiz/quiz-option";
+import { MasteryScore } from "../scoring/mastery-score";
 
 export interface QuizFrameworkProps {
+  quizId: string;
   headline: string;
-  noteMapping: Record<string, Note[]>;
+  quizOptions: QuizOption[];
   asChord?: boolean;
 }
 
 export function QuizFramework({
+  quizId,
   headline,
-  noteMapping,
+  quizOptions,
   asChord,
 }: QuizFrameworkProps) {
   const [question, setQuestion] = useState<QuizQuestion | undefined>();
 
-  const answeredQuestions = useScoreStore((state) => state.answeredQuestions);
+  const { getAnsweredQuestions } = useScoreDataFetcher();
+
+  const answeredQuestions = getAnsweredQuestions(quizId);
+
   const resetAll = useScoreStore((store) => store.resetAll);
 
   const nextQuestion = () => {
-    const newQuestion = getQuizQuestion(
-      noteMapping,
-      answeredQuestions,
-      asChord
-    );
+    const newQuestion = getQuizQuestion(quizId, quizOptions, answeredQuestions);
     setQuestion(newQuestion);
   };
 
@@ -45,7 +50,7 @@ export function QuizFramework({
   useEffect(() => {
     nextQuestion();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [asChord, noteMapping]);
+  }, [asChord, quizOptions]);
 
   const correctNotes = question?.correctOption?.notes;
   // If we haven't populated options yet, don't render anything.
@@ -60,14 +65,15 @@ export function QuizFramework({
         </h2>
         <PlayNote quizOption={question.correctOption} />
       </div>
+      <MasteryScore quizId={quizId} quizOptions={quizOptions} />
       <QuizOptions question={question} nextQuestion={nextQuestion} />
-      <Scoring noteMapping={noteMapping} />
-      <ScoreDetails />
+      <Scoring quizId={quizId} />
+      <ScoreDetails quizId={quizId} />
       <Button
         asChild
         variant="outline"
         onClick={() => {
-          resetAll();
+          resetAll(quizId);
         }}
       >
         <Link href={"/"}>End Session</Link>

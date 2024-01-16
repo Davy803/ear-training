@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { CollapsibleComponent } from "@/components/ui/collapsible";
-import { useScoreStore } from "@/lib/state/score-context";
+import { useScoreDataFetcher, useScoreStore } from "@/lib/state/score-context";
 import {
   Collapsible,
   CollapsibleContent,
@@ -8,13 +8,16 @@ import {
 } from "@radix-ui/react-collapsible";
 import { groupBy } from "lodash";
 
-export function ScoreDetails() {
-  const answeredQuestions = useScoreStore((state) => state.answeredQuestions);
+export function ScoreDetails({ quizId }: { quizId: string }) {
+  const { getAnsweredQuestions } = useScoreDataFetcher();
+
+  const answeredQuestions = getAnsweredQuestions(quizId);
+
   const grouping = groupBy(answeredQuestions, (x) => x.correctOption.text);
   const questions = Object.keys(grouping).map((key) => {
     const answers = grouping[key];
     const correctAnswers = answers.filter(
-      (x) => x.correctOption.key === x.selectedOption.key
+      (x) => x.correctOption.key === x.selectedOption.key,
     );
     return {
       name: key,
@@ -50,19 +53,19 @@ export function ScoreDetails() {
             <tbody>
               {questions.map((question) => {
                 const incorrectAnswers = question.answers.filter(
-                  (x) => x.correctOption.key !== x.selectedOption.key
+                  (x) => x.correctOption.key !== x.selectedOption.key,
                 );
 
                 const answerGrouping = groupBy(
                   incorrectAnswers,
-                  (x) => x.selectedOption.text
+                  (x) => x.selectedOption.text,
                 );
 
                 const answerSummaries = Object.keys(answerGrouping).map(
                   (key) => ({
                     name: key,
                     count: answerGrouping[key].length,
-                  })
+                  }),
                 );
                 return (
                   <Collapsible asChild key={question.name}>

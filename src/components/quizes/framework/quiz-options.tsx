@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Correct } from "./correct";
-import { Incorrect } from "./incorrect";
 import { playNotes } from "@/lib/tone/piano";
 import { useState } from "react";
 import { QuizOption } from "@/lib/quiz/quiz-option";
@@ -23,7 +21,7 @@ export function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
       addAnsweredQuestions: state.addAnsweredQuestions,
       incrementStreak: state.incrementStreak,
       resetStreak: state.resetStreak,
-    }))
+    })),
   );
   if (!correctOption) {
     return <></>;
@@ -35,28 +33,26 @@ export function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
     // Only do scoring if no answer currently selected
     if (selected === undefined) {
       scoring.addAnsweredQuestions({
+        quizId: question.quizId,
         selectedOption: opt,
         correctOption: correctOption,
       });
       if (currentIsCorrect) {
-        scoring.incrementStreak();
+        scoring.incrementStreak(question.quizId);
       } else {
-        scoring.resetStreak();
+        scoring.resetStreak(question.quizId);
       }
 
       setIsCorrect(currentIsCorrect);
       setSelected(opt);
-
-      
-      
     }
     await playNotes({ quizOption: opt });
     if (!currentIsCorrect && selected === undefined) {
-        await playNotes({
-          quizOption: correctOption,
-          time: correctOption.asChord ? 1.5 : 1 + opt.notes.length / 2,
-        });
-      }
+      await playNotes({
+        quizOption: correctOption,
+        time: correctOption.asChord ? 1.5 : 1 + opt.notes.length / 2,
+      });
+    }
   };
 
   return (
@@ -75,8 +71,8 @@ export function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
           return (
             <Button
               key={opt.key}
-              className="h-16"
               variant={variant}
+              size={"lg"}
               onClick={() => onClickAnswer(opt)}
             >
               {opt.text}
@@ -101,13 +97,6 @@ export function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
             Next Question
           </Button>
         </div>
-      )}
-      {isCorrect === true ? (
-        <Correct />
-      ) : isCorrect === false ? (
-        <Incorrect correctAnswer={correctOption} />
-      ) : (
-        <></>
       )}
     </div>
   );
