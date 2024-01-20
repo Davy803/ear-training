@@ -9,18 +9,16 @@ import { NoteList, StartingNote } from "@/lib/note-map";
 import { QuizOption } from "@/lib/quiz/quiz-option";
 import { InstrumentType } from "@/lib/tone/tonejs-Instruments";
 import { sample } from "lodash";
-import { Note } from "tone/Tone/core/type/Units";
-
-export const ChordMap: Record<string, Note[]> = {
-  "C Minor": ["C4", "Eb4", "G4"],
-  "C Major": ["C4", "E4", "G4"],
-};
 
 // prettier-ignore
 export const ChordStepMap = {
   "Minor": [0, 3, 7],
   "Major": [0, 4, 7],
+  "Minor 7th": [0, 3, 7, 11],
+  "Major 7th": [0, 4, 7, 10],
 };
+
+const ChordTypes = Object.keys(ChordStepMap) as ChordTypes[];
 
 const ChordInstrumentList = [
   //   "bass-electric",
@@ -35,7 +33,6 @@ const ChordInstrumentList = [
   "guitar-nylon",
   "harmonium",
   "harp",
-  "organ",
   "piano",
   //   "saxophone",
   //   "trombone",
@@ -76,7 +73,7 @@ export function getChordQuizOptions(
 export function ChordQuiz() {
   const quizOptions = getChordQuizOptions(
     ["C4", "D4", "E4", "F4", "G4"],
-    ["Major", "Minor"],
+    ChordTypes,
   );
 
   return (

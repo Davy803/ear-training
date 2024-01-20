@@ -14,18 +14,26 @@ export interface PlayNoteProps {
   onNotePlayed: (instrument: InstrumentType) => void;
 }
 
-export function PlayNote(props: PlayNoteProps) {
+export function PlayNote({
+  instrument,
+  instrumentList,
+  quizOption,
+  onNotePlayed,
+}: PlayNoteProps) {
   return (
     <Button
       className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
       onClick={() => {
         const realInstrument =
-          props.instrument === "random"
-            ? (sample(props.instrumentList) as InstrumentType)
-            : props.instrument;
+          instrument === "random"
+            ? (sample(instrumentList) as InstrumentType)
+            : instrument;
 
-        playNotes({ ...props, instrument: realInstrument });
-        props.onNotePlayed(realInstrument);
+        playNotes({
+          quizOption,
+          instrument: realInstrument,
+        });
+        onNotePlayed(realInstrument);
       }}
     >
       <PlayIcon className="w-8 h-8 text-gray-900 dark:text-gray-100" />

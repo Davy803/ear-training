@@ -52,12 +52,12 @@ export function QuizOptions({
       setIsCorrect(currentIsCorrect);
       setSelected(opt);
     }
+
     await playNotes({ quizOption: opt, instrument });
     if (!currentIsCorrect && selected === undefined) {
       await playNotes({
         quizOption: correctOption,
         instrument,
-        time: correctOption.asChord ? 1.5 : 1 + (opt.notes?.length ?? 0) / 2,
       });
     }
   };
