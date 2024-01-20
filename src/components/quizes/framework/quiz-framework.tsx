@@ -19,6 +19,9 @@ import { ScoreDetails } from "../scoring/score-details";
 import Link from "next/link";
 import { QuizOption } from "@/lib/quiz/quiz-option";
 import { MasteryScore } from "../scoring/mastery-score";
+import { SelectDropdown } from "@/components/ui/select";
+import { InstrumentList, InstrumentType } from "@/lib/tone/tonejs-Instruments";
+import { InstrumentTypeWithRandom } from "@/lib/tone/player";
 
 export interface QuizFrameworkProps {
   quizId: string;
@@ -26,6 +29,7 @@ export interface QuizFrameworkProps {
   quizOptions: QuizOption[];
   asChord?: boolean;
   preventSameAnswer?: boolean;
+  instrumentList?: InstrumentType[];
 }
 
 export function QuizFramework({
@@ -34,8 +38,15 @@ export function QuizFramework({
   quizOptions,
   preventSameAnswer,
   asChord,
+  instrumentList = [...InstrumentList],
 }: QuizFrameworkProps) {
   const [question, setQuestion] = useState<QuizQuestion | undefined>();
+
+  const [selectedInstrument, setSelectedInstrument] =
+    useState<InstrumentTypeWithRandom>("piano");
+
+  const [realnstrument, setRealInstrument] =
+    useState<InstrumentType>("piano");
 
   const { getAnsweredQuestions } = useScoreDataFetcher();
 
@@ -67,13 +78,29 @@ export function QuizFramework({
   return (
     <main className="w-full max-w-2xl mx-auto flex flex-col items-center gap-6 py-8 px-4">
       <div className="w-full flex flex-col items-center gap-4">
+        <SelectDropdown
+          placeholder="Select an instrument"
+          dropdownLabel="Instruments"
+          items={["random", ...instrumentList].map((x) => ({ value: x }))}
+          value={selectedInstrument}
+          onValueChange={(x) => setSelectedInstrument(x as InstrumentType)}
+        />
         <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
           {headline}
         </h2>
-        <PlayNote quizOption={question.correctOption} />
+        <PlayNote
+          quizOption={question.correctOption}
+          instrument={selectedInstrument}
+          instrumentList={instrumentList}
+          onNotePlayed={(instrument) => setRealInstrument(instrument)}
+        />
       </div>
       <MasteryScore quizId={quizId} quizOptions={quizOptions} />
-      <QuizOptions question={question} nextQuestion={nextQuestion} />
+      <QuizOptions
+        question={question}
+        nextQuestion={nextQuestion}
+        instrument={realnstrument}
+      />
       <Scoring quizId={quizId} />
       <ScoreDetails quizId={quizId} />
       <Button

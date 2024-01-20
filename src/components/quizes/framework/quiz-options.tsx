@@ -1,17 +1,23 @@
 import { Button } from "@/components/ui/button";
-import { playNotes } from "@/lib/tone/piano";
+import { InstrumentTypeWithRandom, playNotes } from "@/lib/tone/player";
 import { useState } from "react";
 import { QuizOption } from "@/lib/quiz/quiz-option";
 import { useScoreStore } from "@/lib/state/score-context";
 import { useShallow } from "zustand/react/shallow";
 import { QuizQuestion } from "@/lib/quiz/question";
+import { InstrumentType } from "@/lib/tone/tonejs-Instruments";
 
 interface QuizOptionsProps {
   nextQuestion: () => void;
   question: QuizQuestion;
+  instrument: InstrumentType;
 }
 
-export function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
+export function QuizOptions({
+  question,
+  nextQuestion,
+  instrument,
+}: QuizOptionsProps) {
   const [selected, setSelected] = useState<QuizOption>();
   const [isCorrect, setIsCorrect] = useState<boolean | undefined>();
 
@@ -46,10 +52,11 @@ export function QuizOptions({ question, nextQuestion }: QuizOptionsProps) {
       setIsCorrect(currentIsCorrect);
       setSelected(opt);
     }
-    await playNotes({ quizOption: opt });
+    await playNotes({ quizOption: opt, instrument });
     if (!currentIsCorrect && selected === undefined) {
       await playNotes({
         quizOption: correctOption,
+        instrument,
         time: correctOption.asChord ? 1.5 : 1 + (opt.notes?.length ?? 0) / 2,
       });
     }

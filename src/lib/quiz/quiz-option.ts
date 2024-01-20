@@ -1,4 +1,5 @@
 import { Note } from "tone/Tone/core/type/Units";
+import { InstrumentType } from "../tone/tonejs-Instruments";
 
 export interface QuizOption {
   uniqueId: string;
@@ -8,5 +9,5 @@ export interface QuizOption {
   populateNotes: () => Note[];
   notes?: Note[];
   asChord?: boolean;
-  instrument: "piano";
+  instrument?: InstrumentType;
 }

@@ -14,8 +14,6 @@ export function getNoteQuizOptions() {
       text: note,
       hintText: "",
       populateNotes: () => [note],
-      asChord: false,
-      instrument: "piano",
     };
   });
 

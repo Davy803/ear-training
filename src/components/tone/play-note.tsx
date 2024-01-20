@@ -1,14 +1,31 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { PlayNoteProps, playNotes } from "@/lib/tone/piano";
+import { QuizOption } from "@/lib/quiz/quiz-option";
+import { InstrumentTypeWithRandom, playNotes } from "@/lib/tone/player";
+import { InstrumentType } from "@/lib/tone/tonejs-Instruments";
+import { sample } from "lodash";
+
+export interface PlayNoteProps {
+  quizOption: QuizOption;
+  time?: number;
+  instrument: InstrumentTypeWithRandom;
+  instrumentList: InstrumentType[];
+  onNotePlayed: (instrument: InstrumentType) => void;
+}
 
 export function PlayNote(props: PlayNoteProps) {
   return (
     <Button
       className="w-24 h-24 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center"
       onClick={() => {
-        playNotes(props);
+        const realInstrument =
+          props.instrument === "random"
+            ? (sample(props.instrumentList) as InstrumentType)
+            : props.instrument;
+
+        playNotes({ ...props, instrument: realInstrument });
+        props.onNotePlayed(realInstrument);
       }}
     >
       <PlayIcon className="w-8 h-8 text-gray-900 dark:text-gray-100" />

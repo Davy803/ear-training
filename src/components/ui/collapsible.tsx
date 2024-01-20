@@ -12,14 +12,7 @@ const CollapsibleComponent = React.forwardRef<HTMLDivElement, CollapsibleProps>(
     const [open, setOpen] = React.useState(false);
     return (
       <Collapsible.Root ref={ref} open={open} onOpenChange={setOpen}>
-        <div
-          className="center text-center flex justify-between"
-          // style={{
-          //   display: "flex",
-          //   alignItems: "center",
-          //   justifyContent: "space-between",
-          // }}
-        >
+        <div className="center text-center flex justify-between">
           <Collapsible.Trigger asChild>
             <Button>{buttonText}</Button>
           </Collapsible.Trigger>
@@ -28,7 +21,7 @@ const CollapsibleComponent = React.forwardRef<HTMLDivElement, CollapsibleProps>(
         <Collapsible.Content>{children}</Collapsible.Content>
       </Collapsible.Root>
     );
-  }
+  },
 );
 CollapsibleComponent.displayName = "Collapsible";
 

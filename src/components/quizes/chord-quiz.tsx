@@ -7,6 +7,7 @@
 import { QuizFramework } from "@/components/quizes/framework/quiz-framework";
 import { NoteList, StartingNote } from "@/lib/note-map";
 import { QuizOption } from "@/lib/quiz/quiz-option";
+import { InstrumentType } from "@/lib/tone/tonejs-Instruments";
 import { sample } from "lodash";
 import { Note } from "tone/Tone/core/type/Units";
 
@@ -20,6 +21,29 @@ export const ChordStepMap = {
   "Minor": [0, 3, 7],
   "Major": [0, 4, 7],
 };
+
+const ChordInstrumentList = [
+  //   "bass-electric",
+  "bassoon",
+  "cello",
+  //   "clarinet",
+  //   "contrabass",
+  //   "flute",
+  //   "french-horn",
+  "guitar-acoustic",
+  "guitar-electric",
+  "guitar-nylon",
+  "harmonium",
+  "harp",
+  "organ",
+  "piano",
+  //   "saxophone",
+  //   "trombone",
+  //   "trumpet",
+  //   "tuba",
+  "violin",
+  "xylophone",
+] as InstrumentType[];
 
 export type ChordTypes = keyof typeof ChordStepMap;
 
@@ -43,7 +67,6 @@ export function getChordQuizOptions(
         return notes;
       },
       asChord: true,
-      instrument: "piano",
     };
   });
 
@@ -61,6 +84,7 @@ export function ChordQuiz() {
       quizId="chords"
       headline={"Identify the chord"}
       quizOptions={quizOptions}
+      instrumentList={ChordInstrumentList}
       asChord
     />
   );
