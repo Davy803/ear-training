@@ -6,8 +6,7 @@ export interface QuizOption {
   key: string;
   text: string;
   hintText: string;
-  populateNotes: () => Note[];
-  notes?: Note[];
+  notes: Note[];
   asChord?: boolean;
   instrument?: InstrumentType;
 }

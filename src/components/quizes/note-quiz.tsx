@@ -3,7 +3,7 @@
  * @see https://v0.dev/t/ejwRzEw5Z0k
  */
 import { QuizFramework } from "@/components/quizes/framework/quiz-framework";
-import { NoteList, NoteMap } from "@/lib/note-map";
+import { NoteList } from "@/lib/note-map";
 import { QuizOption } from "@/lib/quiz/quiz-option";
 
 export function getNoteQuizOptions() {
@@ -13,7 +13,7 @@ export function getNoteQuizOptions() {
       key: note,
       text: note,
       hintText: "",
-      populateNotes: () => [note],
+      notes: [note],
     };
   });
 
@@ -21,12 +21,11 @@ export function getNoteQuizOptions() {
 }
 
 export function NoteQuiz() {
-  const quizOptions = getNoteQuizOptions();
   return (
     <QuizFramework
       quizId="notes"
       headline={"Identify the note"}
-      quizOptions={quizOptions}
+      getQuizOptions={getNoteQuizOptions}
       preventSameAnswer
     />
   );

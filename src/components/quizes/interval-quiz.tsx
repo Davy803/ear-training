@@ -7,22 +7,8 @@
 import { QuizFramework } from "@/components/quizes/framework/quiz-framework";
 import { NoteList } from "@/lib/note-map";
 import { QuizOption } from "@/lib/quiz/quiz-option";
+import { sample } from "lodash";
 import { Note } from "tone/Tone/core/type/Units";
-
-// export const IntervalMap: Record<string, Note[]> = {
-//   Unison: ["C4", "C4"],
-//   "Minor 2nd": ["C4", "Db4"],
-//   "Major 2nd": ["C4", "D4"],
-//   "Minor 3rd": ["C4", "Eb4"],
-//   "Major 3rd": ["C4", "E4"],
-//   "Perfect 4th": ["C4", "F4"],
-//   Tritone: ["C4", "F#4"],
-//   "Perfect 5th": ["C4", "G4"],
-//   "Minor 6th": ["C4", "Ab4"],
-//   "Major 6th": ["C4", "A4"],
-//   "Minor 7th": ["C4", "Bb4"],
-//   "Major 7th": ["C4", "B4"],
-// };
 
 // prettier-ignore
 export const IntervalStepMap: Record<string, number> = {
@@ -43,15 +29,18 @@ export const IntervalStepMap: Record<string, number> = {
 
 export function getIntervalQuizOptions(
   startingNote: Note,
-  direction: "asc" | "desc",
+  direction: "asc" | "desc" | "random",
 ) {
   const keys = Object.keys(IntervalStepMap);
+  const realDirection =
+    direction === "random" ? sample(["asc", "desc"]) : direction;
 
   const allOptions = keys.map((key): QuizOption => {
     const semitones = IntervalStepMap[key];
     const startingNoteIndex = NoteList.indexOf(startingNote);
+
     const nextNoteIndex =
-      direction === "asc"
+      realDirection === "asc"
         ? startingNoteIndex + semitones
         : startingNoteIndex - semitones;
 
@@ -59,8 +48,8 @@ export function getIntervalQuizOptions(
       uniqueId: key,
       key,
       text: key,
-      hintText: `${key} (${startingNote} ${NoteList[nextNoteIndex]})`,
-      populateNotes: () => [startingNote, NoteList[nextNoteIndex]],
+      hintText: `${key} (${startingNote})`,
+      notes: [startingNote, NoteList[nextNoteIndex]],
       asChord: false,
       instrument: "piano",
     };
@@ -70,12 +59,11 @@ export function getIntervalQuizOptions(
 }
 
 export function IntervalQuiz() {
-  const quizOptions = getIntervalQuizOptions("G4", "desc"); //getQuizOptions(IntervalMap);
   return (
     <QuizFramework
       quizId="interval"
       headline={"Identify the interval"}
-      quizOptions={quizOptions}
+      getQuizOptions={() => getIntervalQuizOptions("G4", "random")}
       preventSameAnswer
     />
   );

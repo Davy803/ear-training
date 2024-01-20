@@ -26,7 +26,7 @@ import { InstrumentTypeWithRandom } from "@/lib/tone/player";
 export interface QuizFrameworkProps {
   quizId: string;
   headline: string;
-  quizOptions: QuizOption[];
+  getQuizOptions: () => QuizOption[];
   asChord?: boolean;
   preventSameAnswer?: boolean;
   instrumentList?: InstrumentType[];
@@ -35,7 +35,7 @@ export interface QuizFrameworkProps {
 export function QuizFramework({
   quizId,
   headline,
-  quizOptions,
+  getQuizOptions,
   preventSameAnswer,
   asChord,
   instrumentList = [...InstrumentList],
@@ -57,7 +57,7 @@ export function QuizFramework({
   const nextQuestion = () => {
     const newQuestion = getQuizQuestion(
       quizId,
-      quizOptions,
+      getQuizOptions,
       answeredQuestions,
       preventSameAnswer === true,
     );
@@ -68,7 +68,7 @@ export function QuizFramework({
   useEffect(() => {
     nextQuestion();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [asChord, quizOptions]);
+  }, [asChord, getQuizOptions]);
 
   // If we haven't populated options yet, don't render anything.
   if (!question) {
@@ -95,7 +95,7 @@ export function QuizFramework({
           onNotePlayed={(instrument) => setRealInstrument(instrument)}
         />
       </div>
-      <MasteryScore quizId={quizId} quizOptions={quizOptions} />
+      <MasteryScore quizId={quizId} quizOptions={question.options} />
       <QuizOptions
         question={question}
         nextQuestion={nextQuestion}

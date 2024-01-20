@@ -22,27 +22,18 @@ export function getQuizMasteryScore(
 
 export function getQuizQuestion(
   quizId: string,
-  allOptions: QuizOption[],
+  getQuizOptions: () => QuizOption[],
   answeredQuestions: AnsweredQuestion[],
   preventSameAnswer: boolean,
 ): QuizQuestion {
-  // Make a clone of the options with the notes populated, so the original will remain unpopulated
-  // and unmodified
-  const clonedOptions: QuizOption[] = allOptions.map((x) => ({
-    uniqueId: x.uniqueId,
-    key: x.key,
-    text: x.text,
-    hintText: x.hintText,
-    populateNotes: x.populateNotes,
-    notes: x.populateNotes(),
-    asChord: x.asChord,
-    instrument: x.instrument,
-  }));
-  const clonedOptionsMap = keyBy(clonedOptions, "key");
+  
+  const quizOptions: QuizOption[] = getQuizOptions();
+  
+  const quizOptionsMap = keyBy(quizOptions, "key");
 
   const weights = getQuestionWeights(
     answeredQuestions,
-    Object.keys(clonedOptionsMap),
+    Object.keys(quizOptionsMap),
     preventSameAnswer,
   );
 
@@ -54,13 +45,13 @@ export function getQuizQuestion(
 
   const options = getOptions(
     answeredQuestions,
-    clonedOptionsMap,
+    quizOptionsMap,
     correctAnswerKey,
   );
 
   return {
     quizId,
-    correctOption: clonedOptionsMap[correctAnswerKey],
+    correctOption: quizOptionsMap[correctAnswerKey],
     options,
   };
 }

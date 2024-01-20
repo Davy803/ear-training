@@ -50,19 +50,16 @@ export function getChordQuizOptions(
 ) {
   const allOptions = chordTypes.map((chordType): QuizOption => {
     const semitones = ChordStepMap[chordType];
+    const startingNote = sample(startingNotes) as StartingNote;
+    const startingNoteIndex = NoteList.indexOf(startingNote);
 
+    const notes = semitones.map((x) => NoteList[startingNoteIndex + x]);
     return {
       uniqueId: `chord-${chordType}`,
       key: `${chordType}`,
       text: `${chordType}`,
       hintText: "",
-      populateNotes: () => {
-        const startingNote = sample(startingNotes) as StartingNote;
-        const startingNoteIndex = NoteList.indexOf(startingNote);
-
-        const notes = semitones.map((x) => NoteList[startingNoteIndex + x]);
-        return notes;
-      },
+      notes: notes,
       asChord: true,
     };
   });
@@ -71,16 +68,13 @@ export function getChordQuizOptions(
 }
 
 export function ChordQuiz() {
-  const quizOptions = getChordQuizOptions(
-    ["C4", "D4", "E4", "F4", "G4"],
-    ChordTypes,
-  );
-
   return (
     <QuizFramework
       quizId="chords"
       headline={"Identify the chord"}
-      quizOptions={quizOptions}
+      getQuizOptions={() =>
+        getChordQuizOptions(["C4", "D4", "E4", "F4", "G4"], ChordTypes)
+      }
       instrumentList={ChordInstrumentList}
       asChord
     />
