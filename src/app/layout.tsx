@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,7 +25,7 @@ export default function RootLayout({
               <Link href={"/"}> Ear Training App</Link>
             </h1>
             <div className="flex items-center gap-4">
-                Login coming soon.
+              Login coming soon.
               <Link
                 className="text-gray-600 dark:text-gray-300 hover:underline"
                 href="#"
@@ -43,6 +44,7 @@ export default function RootLayout({
             {children}
           </div>
         </div>
+        <SpeedInsights />
       </body>
     </html>
   );
